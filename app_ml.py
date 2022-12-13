@@ -1,20 +1,41 @@
-import streamlit as st 
+import streamlit as st
 import numpy as np
 import joblib
-def run_ml_app() :
+
+def run_ml_app():
     st.subheader('자동차 금액 예측')
     
-    # 성별,나이,연봉,카드빛,자산을 유저에게 입력받아
-    # 자동차 구매 금액을 예측하시오
-    input1 = st.number_input('성별을 입력하시오',0,1)
-    st.text('여자는 0')
-    input2 = st.number_input('나이을 입력하시오',1,1000000)
-    input3 = st.number_input('연봉을 입력하시오',1,1000000)
-    input4 = st.number_input('카드빛을 입력하시오',1,1000000)
-    input5 = st.number_input('자산을 입력하시오',1,1000000)
+    # 성별, 나이, 연봉, 카드빚, 자산을 유저한테 모두 입력받아서
+    # 자동차 구매 금액 예측하세요.
+
+    gender = st.radio('성별 선택', ['여자', '남자'])
     
-    new_data = np.array([input1 , input2 ,input3 , input4 , input5])
-    new_data = new_data.reshape(1,5)
+    if gender == '여자' :
+        gender = 0
+    else :
+        gender = 1
+
+    age = st.number_input('나이 입력', 18, 100)
+
+    salary = st.number_input('연봉 입력', 10000, 1000000)
+
+    debt = st.number_input('카드빚 입력', 0, 1000000)
+
+    worth = st.number_input('자산 입력', 1000, 10000000)
+
+    new_data = np.array([gender, age, salary, debt, worth])
+
+    print(new_data)
+
+    new_data = new_data.reshape(1, 5)
+
     regressor = joblib.load('regressor.pkl')
-    st.subheader('예측값')
-    st.text(regressor.predict(new_data))
+
+    y_pred = regressor.predict(new_data)
+
+    y_pred = round(y_pred[0] , 1)
+
+    if y_pred < 0 :
+        st.info('입력한 데이터로는 금액을 예측하기 어렵습니다.')    
+    else :
+        st.info('예측한 자동차 금액은 {}달러 입니다.'.format(y_pred))
